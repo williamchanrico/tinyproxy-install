@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+# Title: tinyproxy-install
+# Description: Install and config tinyproxy on debian system to allow ALL connections
+# Author: William Chanrico
+# Date: 27-Dec-2016
+
+echo " _____________________ 	"
+echo "/ hello, who's there? \\	"
+echo "\\ william said hi...  /	"
+echo " ---------------------	"
+echo "       \\   ,__,			"
+echo "        \\  (..)____		"
+echo "           (__)    )\		"
+echo "              ||--|| *	"
+echo "Install and config tinyproxy package on debian system"
+
+if [[ "$EUID" -ne 0 ]]; then
+    echo "Sorry, you need to run this as root"
+    exit 1
+fi
+
+if [[ -e /etc/debian_version || $(which apt 2>/dev/null) ]]; then
+    echo "You're on debian based system"
+	OS=debian
+else
+	echo "Looks like you aren't running this installer on a Debian or Ubuntu system"
+	exit 2
+fi
+
+echo -e '\nInstalling package'
+
+if [[ $(which tinyproxy 2>/dev/null) ]]; then
+	echo 'Package already installed in this system'
+	exit 3
+fi
+
+apt update >/dev/null 2>&1
+apt install -y tinyproxy >/dev/null 2>&1
+
+if [[ $(which tinyproxy 2>/dev/null) ]]; then
+	echo 'Package has been installed successfully'
+else
+	echo 'There was an error while installing the package'
+	exit 4
+fi
+
+echo "Creating a backup config files '/etc/tinyproxy.conf.bak'"
+
+cp /etc/tinyproxy.conf /etc/tinyproxy.conf.bak
+
+echo 'Configuring to allow access from all connections on port 8080'
+
+sed -e '/Allow 127.0.0.1/s/^/#/g' -i /etc/tinyproxy.conf
+sed -e 's/Port 8888/Port 8080/gI' -i /etc/tinyproxy.conf
+
+echo 'Restarting squid service'
+service tinyproxy restart >/dev/n
+ull 2>&1
+
+echo -e 'Done\n'
