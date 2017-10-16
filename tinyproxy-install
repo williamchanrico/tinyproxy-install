@@ -54,7 +54,7 @@ echo 'Configuring to allow access from all connections on port 8080'
 sed -e '/Allow 127.0.0.1/s/^/#/g' -i /etc/tinyproxy.conf
 sed -e 's/Port 8888/Port 8080/gI' -i /etc/tinyproxy.conf
 
-echo 'Restarting squid service'
+echo 'Restarting tinyproxy service'
 service tinyproxy restart >/dev/n
 ull 2>&1
 
